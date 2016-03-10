@@ -13,11 +13,10 @@ public class Main{
     
     public static void main(String[] arg){
         final ResourceMenager resources = new ResourceMenager();
-        System.out.println(resources.getPathTo(inputImage));
         IplImage image = cvLoadImage(resources.getPathTo(inputImage));
         if(image != null){
             detect_faces(image);
-            namedWindow("", WINDOW_NORMAL);
+            namedWindow("Result", WINDOW_NORMAL);
             cvShowImage("Result",image);
             cvWaitKey(0);
             System.out.println("OK.");
@@ -44,6 +43,6 @@ public class Main{
 class ResourceMenager{
     public String getPathTo(String resourceName){
         String path = getClass().getResource("/" + resourceName).getPath();
-        return path.substring(1, path.length());
+        return path.substring(1, path.length()); //I don't know, why i need to do this. Maybe it depends on OS
     }
 }
