@@ -18,7 +18,7 @@ public class Main {
     
     public static void main(String[] args) throws Exception {
         IplImage image = cvLoadImage(args[0]);
-        if(image != null){
+        if (image != null){
             detectFaces(image);
             namedWindow("Result", WINDOW_NORMAL);
             cvShowImage("Result", image);
@@ -37,7 +37,7 @@ public class Main {
                 1.5, 3, CV_HAAR_DO_CANNY_PRUNING);
         cvClearMemStorage(storage);
         int totalCount = faces.total();
-        for(int i = 0; i < totalCount; i++) {
+        for (int i = 0; i < totalCount; i++) {
             CvRect rect = new CvRect(cvGetSeqElem(faces,i));
             cvRectangle(image, cvPoint(rect.x(), rect.y()), 
                     cvPoint(rect.width() + rect.x(), rect.height() + rect.y()), 
