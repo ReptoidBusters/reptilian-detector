@@ -1,7 +1,7 @@
 package ru.spbau.mit.reptilian_detector.detector;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.net.URL;
 
 import org.bytedeco.javacpp.indexer.*;
 import org.bytedeco.javacpp.*;
@@ -14,9 +14,7 @@ import static org.bytedeco.javacpp.opencv_highgui.*;
 
 
 public class Main {
-	
     static final String frontalfaceXmlPath = "haarcascade_frontalface_alt.xml";
-    static final String inputImage = "input.jpg";
     
     public static void main(String[] args) throws Exception {
         IplImage image = cvLoadImage(args[0]);
@@ -33,27 +31,24 @@ public class Main {
     
     static void detectFaces(IplImage image) throws Exception {
         CvHaarClassifierCascade cascade = new CvHaarClassifierCascade(
-            cvLoad(getPathTo(frontalfaceXmlPath)));
+                cvLoad(getPathTo(frontalfaceXmlPath)));
         CvMemStorage storage = CvMemStorage.create();
         CvSeq faces = cvHaarDetectObjects(image, cascade, storage,
-            1.5, 3, CV_HAAR_DO_CANNY_PRUNING);
+                1.5, 3, CV_HAAR_DO_CANNY_PRUNING);
         cvClearMemStorage(storage);
         int totalCount = faces.total();
-        for(int i = 0; i < totalCount; i++){
+        for(int i = 0; i < totalCount; i++) {
             CvRect rect = new CvRect(cvGetSeqElem(faces,i));
             cvRectangle(image, cvPoint(rect.x(), rect.y()), 
-                cvPoint(rect.width() + rect.x(), rect.height() + rect.y()), 
-                CvScalar.GREEN, 2, CV_AA, 0);
+                    cvPoint(rect.width() + rect.x(), rect.height() + rect.y()), 
+                    CvScalar.GREEN, 2, CV_AA, 0);
         }
-        
     }
 
-    static String getPathTo(String resourceName) throws Exception{
-        Main tmp = new Main();
-        URL url = tmp.getClass().getClassLoader().getResource(resourceName);
+    static String getPathTo(String resourceName) throws Exception {
+        URL url = Main.class.getResource(resourceName);
         File file = Loader.extractResource(url, null, resourceName, resourceName);
         file.deleteOnExit();
         return file.getAbsolutePath();
     }
 }
-
