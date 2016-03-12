@@ -1,22 +1,31 @@
 apply plugin: "java"
 apply plugin: "application"
 
-mainClassName = "ru.spbau.mit.backend.Main"
+import org.gradle.nativeplatform.platform.NativePlatform
+import org.apache.tools.ant.taskdefs.condition.Os
+
+mainClassName = 'ru.spbau.mit.reptilian_detector.detector.Main'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
-def bytedeco = 'org.bytedeco'
-def javaCppPresets = bytedeco + '.javacpp-presets'
-def platform = 'windows-x86_64'
-def javaCvVersion = '1.1'
 
 dependencies {
-	///presets   
+    def bytedeco = 'org.bytedeco'
+    def javaCppPresets = bytedeco + '.javacpp-presets'
+    def javaCvVersion = '1.1'
+    String platform = 'linux-x86'
+    if(System.properties['os.name'].toLowerCase().contains('windows'))
+        platform = 'windows-x86'
+    if(System.properties['os.name'].toLowerCase().contains('android'))
+        platform = 'android-arm'
+    if(System.properties['os.arch'].contains('64'))
+        platform += '_64'
+    
     compile group: javaCppPresets, name: 'artoolkitplus', version: '2.3.1-' + javaCvVersion, classifier: platform
     compile group: javaCppPresets, name: 'ffmpeg',        version: '2.8.1-' + javaCvVersion, classifier: platform
     compile group: javaCppPresets, name: 'flandmark',     version: '1.07-' + javaCvVersion,  classifier: platform
@@ -24,15 +33,14 @@ dependencies {
     compile group: javaCppPresets, name: 'libdc1394',     version: '2.2.3-' + javaCvVersion, classifier: platform
     compile group: javaCppPresets, name: 'libfreenect',   version: '0.5.3-' + javaCvVersion, classifier: platform
     compile group: javaCppPresets, name: 'opencv',        version: '3.0.0-' + javaCvVersion, classifier: platform
-	///javacv and javacpp
     compile group: bytedeco, name: 'javacpp', version: javaCvVersion
     compile group: bytedeco, name: 'javacv',  version: javaCvVersion
 }
 
 jar{
-	manifest.attributes("Main-Class": mainClassName)
+    manifest.attributes("Main-Class": mainClassName)
 }
 
 task Wrapper(type: Wrapper){
-	gradleVersion = '2.1'
+    gradleVersion = '2.12'
 }
