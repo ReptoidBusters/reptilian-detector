@@ -19,10 +19,7 @@ repositories {
     jcenter()
 }
 
-dependencies {
-    compile 'joda-time:joda-time:2.7'
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '2.3'
 }
+
