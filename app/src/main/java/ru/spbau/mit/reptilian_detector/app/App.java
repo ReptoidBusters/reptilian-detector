@@ -4,8 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+
 public class App extends Activity {
-    
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,8 +17,7 @@ public class App extends Activity {
     public void onStart() {
         super.onStart();
         TextView textView = (TextView) findViewById(R.id.text_view);
-        textView.setText("Hello, world !!!");
+        textView.setText("Hello, world!");
     }
 
 }
-
