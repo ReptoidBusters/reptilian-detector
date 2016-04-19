@@ -1,66 +1,92 @@
 package ru.spbau.mit.reptilian_detector.detector;
 
-import java.util.ArrayList;
-
 import org.bytedeco.javacv.*;
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
 public class Face {
-    public RectVector eyes;
-    public Rect nose;
-    public Rect mouth;
-    public Mat image; //Not all image, face rect only.
-    public Mat grayImage;
-    public Rect position;
-    
-        
-    //Inner methods
-    
-    void iniFace (Mat im, Mat gim, Rect pos, RectVector eyesIni, Rect noseIni, Rect mouthIni) {
-        image = im;
-        grayImage = gim;
-        nose = noseIni;
-        mouth = mouthIni;
-        eyes = eyesIni;
-        position = pos;
-    }
+    private RectVector eyes;
+    private Rect nose;
+    private Rect mouth;
+    //!Not all image, face rect only.
+    private Mat image; 
+    private Mat grayImage;
+    private Rect position;
     
     //Constructors
     //im - full image
     //pos - face position on image
-    
-    public Face (Mat im, Rect pos) {
-        im = new Mat(im, pos);
-        Mat gim = new Mat();
-        cvtColor(im, gim, CV_BGR2GRAY);
-        equalizeHist(gim,gim);
-        iniFace(im, gim, pos, null, null, null);
-    }
-    
-    public Face (Mat im, Mat gim, Rect pos) {
-        im = new Mat(im, pos);
-        gim = new Mat(gim, pos);
-        iniFace(im, gim, pos, null, null, null);
-    }
-    
-    public Face (Mat im, Rect pos, RectVector eyesIni, Rect noseIni, Rect mouthIni) {
-        im = new Mat(im, pos); 
-        Mat gim = new Mat();
-        cvtColor(im, gim, CV_BGR2GRAY);
-        equalizeHist(gim,gim);   
-        iniFace(im, gim , pos, eyesIni, noseIni, mouthIni);
-    }
-    
-    public Face (Mat im, Mat gim, Rect pos, RectVector eyesIni, Rect noseIni, Rect mouthIni) {
-        im = new Mat(im, pos);
-        gim = new Mat(gim, pos);
-        iniFace(im, gim, pos, eyesIni, noseIni, mouthIni);
-    }
-    
     public Face() {
         iniFace(null, null, null, null, null, null);
+    }
+    
+    public Face(Mat im, Rect pos) {
+        final Mat tim = new Mat(im, pos);
+        final Mat gim = new Mat();
+        cvtColor(tim, gim, CV_BGR2GRAY);
+        equalizeHist(gim, gim);
+        iniFace(tim, gim, pos, null, null, null);
+    }
+    
+    public Face(Mat im, Mat gim, Rect pos) {
+        final Mat tim = new Mat(im, pos);
+        final Mat tgim = new Mat(gim, pos);
+        iniFace(tim, tgim, pos, null, null, null);
+    }
+    
+    public Face(Mat im, Rect pos, RectVector eyesIni, Rect noseIni, Rect mouthIni) {
+        final Mat tim = new Mat(im, pos); 
+        final Mat gim = new Mat();
+        cvtColor(tim, gim, CV_BGR2GRAY);
+        equalizeHist(gim, gim);   
+        iniFace(tim, gim, pos, eyesIni, noseIni, mouthIni);
+    }
+    
+    public Face(Mat im, Mat gim, Rect pos, RectVector eyesIni, Rect noseIni, Rect mouthIni) {
+        final Mat tim = new Mat(im, pos);
+        final Mat tgim = new Mat(gim, pos);
+        iniFace(tim, tgim, pos, eyesIni, noseIni, mouthIni);
+    }
+    
+    //Field access methods
+    ////Get methods
+    
+    public Rect getPos() {
+        return position;
+    }
+    
+    public RectVector getEyes() {
+        return eyes;
+    }
+    
+    public Rect getMouth() {
+        return mouth;
+    }
+    
+    public Rect getNose() {
+        return nose;
+    }
+    
+    public Mat getImage() {
+        return image;
+    }
+    
+    public Mat getGrayImage() {
+        return grayImage;
+    }
+    
+    ////Set methods    
+    public void setEyes(RectVector newEyes) {
+        eyes = newEyes;
+    }
+    
+    public void setNose(Rect newNose) {
+        nose = newNose;
+    }
+    
+    public void setMouth(Rect newMouth) {
+        mouth = newMouth;
     }
     
     //Other methods
@@ -74,11 +100,22 @@ public class Face {
                 }
             }
             if (mouth != null) {
-                f.applyMouthFilter(image,mouth);
+                f.applyMouthFilter(image, mouth);
             }
             if (nose != null) {
-                f.applyNoseFilter(image,nose);
+                f.applyNoseFilter(image, nose);
             }
         }
+    }
+    
+    //Inner methods
+    
+    void iniFace(Mat im, Mat gim, Rect pos, RectVector eyesIni, Rect noseIni, Rect mouthIni) {
+        image = im;
+        grayImage = gim;
+        nose = noseIni;
+        mouth = mouthIni;
+        eyes = eyesIni;
+        position = pos;
     }
 }
