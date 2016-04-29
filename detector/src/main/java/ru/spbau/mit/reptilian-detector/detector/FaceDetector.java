@@ -12,7 +12,10 @@ import static org.bytedeco.javacpp.opencv_objdetect.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
 
 
-public class FaceDetector {    
+public class FaceDetector {   
+    static final float FACE_DETECT_ACCURACY = 1.05f;
+    static final float FEATURE_DETECT_ACCURACY = 1.03f;
+ 
     static final String FACE_HAAR_CASCADE_NAME  
             = "haarcascades/haarcascade_frontalface.xml";
     static final String RIGHT_EYE_HAAR_CASCADE_NAME  
@@ -58,7 +61,7 @@ public class FaceDetector {
         equalizeHist(imageGray, imageGray);
         RectVector faceRects = new RectVector();
         faceHaarCascade.detectMultiScale(imageGray, faceRects,
-                1.05, 8, CV_HAAR_DO_CANNY_PRUNING,
+                FACE_DETECT_ACCURACY, 8, CV_HAAR_DO_CANNY_PRUNING,
                 new Size(150, 150), new Size(imageGray.cols(), imageGray.rows()));
         faceRects = deleteInnerRects(faceRects);
         final ArrayList<Face> result = new ArrayList<Face>();
@@ -73,6 +76,7 @@ public class FaceDetector {
                 detectEyesOnFace(newFace);
                 detectMouthOnFace(newFace);
                 detectNoseOnFace(newFace);
+                detectSkin(newFace);
             }
             result.add(newFace);
         }
@@ -81,10 +85,10 @@ public class FaceDetector {
     
     public void detectEyesOnFace(Face face) {
         final Rect leftEyesPositionRect = new Rect(new Point(0, face.getPos().height() / 7),
-                new Point(face.getPos().width() / 2, face.getPos().height() * 4 / 7));
-        final Rect rightEyesPositionRect = new Rect(new Point(face.getPos().width() / 2, 
+                new Point(face.getPos().width() * 3 / 5, face.getPos().height() * 9 / 14));
+        final Rect rightEyesPositionRect = new Rect(new Point(face.getPos().width() * 1 / 5, 
                 face.getPos().height() / 7), new Point(face.getPos().width(),
-                face.getPos().height() * 4 / 7));
+                face.getPos().height() * 9 / 14));
         final Mat leftGrayFace = new Mat(face.getGrayImage(), leftEyesPositionRect);
         final Mat rightGrayFace = new Mat(face.getGrayImage(), rightEyesPositionRect);
         
@@ -94,7 +98,7 @@ public class FaceDetector {
         final RectVector eyes = new RectVector();
         RectVector leftEyeRects = new RectVector();
         leftEyeHaarCascade.detectMultiScale(leftGrayFace, leftEyeRects,
-                1.05, 2, CV_HAAR_DO_CANNY_PRUNING,
+                FEATURE_DETECT_ACCURACY, 2, CV_HAAR_DO_CANNY_PRUNING,
                 minFeatureSize, maxFeatureSize);
         leftEyeRects = deleteInnerRects(leftEyeRects);
         Rect leftEye = null;
@@ -113,7 +117,7 @@ public class FaceDetector {
         }
         RectVector rightEyeRects = new RectVector();
         rightEyeHaarCascade.detectMultiScale(rightGrayFace, rightEyeRects,
-                1.05, 2, CV_HAAR_DO_CANNY_PRUNING,
+                FEATURE_DETECT_ACCURACY, 2, CV_HAAR_DO_CANNY_PRUNING,
                 minFeatureSize, maxFeatureSize);
         rightEyeRects = deleteInnerRects(rightEyeRects);
         Rect rightEye = null;
@@ -125,9 +129,9 @@ public class FaceDetector {
                 }
             } 
             eyes.resize(eyes.size() + 1);
-            eyes.put(eyes.size() - 1, new Rect(new Point(face.getPos().width() / 2 + rightEye.x(),
+            eyes.put(eyes.size() - 1, new Rect(new Point(face.getPos().width() * 1 / 3 + rightEye.x(),
                 rightEye.y() + face.getPos().height() / 7), new Point(
-                face.getPos().width() / 2 + rightEye.x() + rightEye.width(),
+                face.getPos().width() * 1 / 3 + rightEye.x() + rightEye.width(),
                 rightEye.y() + rightEye.height() + face.getPos().height() / 7)));
         }
         face.setEyes(eyes); 
@@ -141,7 +145,7 @@ public class FaceDetector {
         final Size maxFeatureSize = new Size(face.getPos().width() / 2, face.getPos().height() / 2);
         RectVector noseRects = new RectVector();
         noseHaarCascade.detectMultiScale(grayFace, noseRects,
-                1.05, 3, CV_HAAR_DO_CANNY_PRUNING,
+                FEATURE_DETECT_ACCURACY, 3, CV_HAAR_DO_CANNY_PRUNING,
                 minFeatureSize, maxFeatureSize);
         noseRects = deleteInnerRects(noseRects);
         if (noseRects.size() > 0) {
@@ -167,7 +171,7 @@ public class FaceDetector {
         final Size maxFeatureSize = new Size(face.getPos().width() / 2, face.getPos().height());
         RectVector mouthRects = new RectVector();
         mouthHaarCascade.detectMultiScale(grayFace, mouthRects,
-                1.05, 2, CV_HAAR_DO_CANNY_PRUNING,
+                FEATURE_DETECT_ACCURACY, 2, CV_HAAR_DO_CANNY_PRUNING,
                 minFeatureSize, maxFeatureSize);
         mouthRects = deleteInnerRects(mouthRects);
         if (mouthRects.size() > 0) {
@@ -183,6 +187,10 @@ public class FaceDetector {
                     result.y() + result.height() + face.getPos().height() * 9 / 14));
             face.setMouth(cutRect(result, face.getImage()));
         }
+    }
+    
+    public void detectSkin(Face face) {
+        //Not implemented
     }
     //Inner Methods
     

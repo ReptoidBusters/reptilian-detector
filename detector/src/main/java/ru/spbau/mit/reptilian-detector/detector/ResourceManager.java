@@ -9,7 +9,7 @@ import org.bytedeco.javacv.*;
 
 public class ResourceManager {
     static String getPath(String resourceName) throws Exception {
-        final int nameStartIndex = resourceName.indexOf("/") + 1;
+        final int nameStartIndex = resourceName.lastIndexOf("/") + 1;
         final String rName = resourceName.substring(nameStartIndex);
         final URL url = ResourceManager.class.getClassLoader().getResource(resourceName);
         final File file = Loader.extractResource(url, null, rName, rName);

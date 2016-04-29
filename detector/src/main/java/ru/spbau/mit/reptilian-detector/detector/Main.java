@@ -35,7 +35,7 @@ public class Main {
         } else {
             Mat image;
             final FaceDetector detector = new FaceDetector();
-            final RectFilter filter = new RectFilter();
+            final IFilter filter = new FaceOrientationTestFilter();//RectFilter();
             final VideoCapture camera = new VideoCapture(0);
             camera.open(0);
             while (true) {
