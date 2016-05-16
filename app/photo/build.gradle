@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'com.noveogroup.android.check'
 
 android {
     compileSdkVersion 23
@@ -19,9 +20,15 @@ android {
     }
 }
 
+check {
+  abortOnError true
+  checkstyle { config easy() }
+  findbugs { config easy() }
+  pmd { config hard() }
+}
+
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.2.0'
     compile 'com.android.support:design:23.2.0'
 }
+

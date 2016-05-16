@@ -2,36 +2,39 @@ package ru.spbau.mit.reptilian_detector.app;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
-import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-public class App extends Activity {
 
-    File directory;
-    final int TYPE_PHOTO = 1;
-    final int TYPE_VIDEO = 2;
+public class App extends AppCompatActivity {
 
-    final int REQUEST_CODE_PHOTO = 1;
-    final int REQUEST_CODE_VIDEO = 2;
+    private static final Logger LOG = Logger.getLogger(AppCompatActivity.class.getName());
+
+    private File directory;
+    private static final int TYPE_PHOTO = 1;
+    private static final int TYPE_VIDEO = 2;
+
+    private static final int REQUEST_CODE_PHOTO = 1;
+    private static final int REQUEST_CODE_VIDEO = 2;
 
     public static final String IMAGE_URI_EXTRAS = "imgageUri";
 
-    final String TAG = "myLogs";
+    private static final String TAG = "myLogs";
 
-    Uri imageUri;
+    private Uri imageUri;
 
-    ImageView ivPhoto;
+    private ImageView ivPhoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +46,6 @@ public class App extends Activity {
 
     public void onClickPhoto(View view) {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//        intent.putExtra(MediaStore.EXTRA_OUTPUT, generateFileUri(TYPE_PHOTO));
         startActivityForResult(intent, REQUEST_CODE_PHOTO);
     }
 
@@ -59,7 +61,7 @@ public class App extends Activity {
             ivPhoto.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 500, 500, false));
             ivPhoto.invalidate();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.log(Level.SEVERE, e.toString(), e);
         }
     }
 
@@ -70,10 +72,8 @@ public class App extends Activity {
         if (requestCode == REQUEST_CODE_PHOTO) {
             if (resultCode == RESULT_OK) {
                 if (intent == null) {
-                    //    s = "4";
                     Log.d(TAG, "Intent is null");
                 } else {
-                    //    s = "5";
                     Log.d(TAG, "Photo uri: " + intent.getData());
                     imageUri = intent.getData();
 
@@ -88,7 +88,6 @@ public class App extends Activity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
-        //savedInstanceState.putInt("counter", k);
         if (imageUri != null) {
             savedInstanceState.putParcelable(IMAGE_URI_EXTRAS, imageUri);
         }
@@ -97,7 +96,6 @@ public class App extends Activity {
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        //k = savedInstanceState.getInt("counter");
         if (savedInstanceState.containsKey(IMAGE_URI_EXTRAS)) {
             imageUri = savedInstanceState.getParcelable(IMAGE_URI_EXTRAS);
             setImageUri();
@@ -115,6 +113,8 @@ public class App extends Activity {
                 file = new File(directory.getPath() + "/" + "video_"
                         + System.currentTimeMillis() + ".mp4");
                 break;
+            default:
+                break;
         }
         Log.d(TAG, "fileName = " + file);
         return Uri.fromFile(file);
@@ -125,8 +125,9 @@ public class App extends Activity {
                 Environment
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 "MyFolder");
-        if (!directory.exists())
-            directory.mkdirs();
+        if (!directory.exists()) {
+            assert directory.mkdirs();
+        }
     }
 
 }
