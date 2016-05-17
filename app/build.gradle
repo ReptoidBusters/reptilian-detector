@@ -4,7 +4,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.5.0'
-	classpath 'com.noveogroup.android:check:1.2.3'
+        classpath 'com.noveogroup.android:check:1.2.3'
     }
 }
 
@@ -18,11 +18,3 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-//check {
-//  abortOnError true
-//  checkstyle { config hard() }
-//  findbugs { config hard() }
-//  pmd { config hard() }
-//}
-
-//apply plugin: 'com.noveogroup.android.check'

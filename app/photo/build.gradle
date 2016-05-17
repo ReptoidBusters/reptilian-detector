@@ -21,10 +21,10 @@ android {
 }
 
 check {
-  abortOnError true
-  checkstyle { config easy() }
-  findbugs { config easy() }
-  pmd { config hard() }
+    abortOnError true
+    checkstyle { config easy() }
+    findbugs { config easy() }
+    pmd { config hard() }
 }
 
 dependencies {
