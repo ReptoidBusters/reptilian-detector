@@ -17,44 +17,42 @@ public class FaceOrientationTestFilter implements IFilter {
     private Mat featuresOnImage;
     private Mat altFeaturesOnImage;
     
-    FaceOrientationTestFilter() throws Exception{
+    FaceOrientationTestFilter() throws Exception {
         faceImage = imread(ResourceManager.getPath(FACE_IMAGE_NAME));
         final Mat tmp = imread(ResourceManager.getPath(FACE_MASK_NAME));
         faceMask = new Mat();
         cvtColor(tmp, faceMask, CV_BGR2GRAY);
-        featuresOnImage = new Mat( 
+        featuresOnImage = new Mat(
                 820f, 1650f,
                 1750f, 1650f,
                 1300f, 2190f).reshape(2, 3);
-        altFeaturesOnImage = new Mat( 
+        altFeaturesOnImage = new Mat(
                 820f, 1650f,
                 1750f, 1650f,
                 1300f, 2640f).reshape(2, 3);
-        System.out.println("!" + featuresOnImage.toString());
     }
     
     @Override
-    public void applyEyeFilter(Mat face, Mat skinMask, Mat perspectivePoints, Mat affinePoints, Mat altAffinePoints, Rect eye) {
+    public void applyEyeFilter(Mat face, Mat skinMask, TransformationFacePointsCollection points, Rect eye) {
         rectangle(face, new Point(eye.x(), eye.y()),
                 new Point(eye.x() + eye.width(), eye.y() + eye.height()), Scalar.GREEN,
                 2, CV_AA, 0);
     }
     @Override
-    public void applyNoseFilter(Mat face, Mat skinMask, Mat perspectivePoints, Mat affinePoints, Mat altAffinePoints, Rect nose) {
+    public void applyNoseFilter(Mat face, Mat skinMask, TransformationFacePointsCollection points, Rect nose) {
         rectangle(face, new Point(nose.x(), nose.y()),
                 new Point(nose.x() + nose.width(), nose.y() + nose.height()), Scalar.BLUE,
                 2, CV_AA, 0);
     }
     @Override
-    public void applyMouthFilter(Mat face, Mat skinMask, Mat perspectivePoints, Mat affinePoints, Mat altAffinePoints, Rect mouth) {
+    public void applyMouthFilter(Mat face, Mat skinMask, TransformationFacePointsCollection points, Rect mouth) {
         rectangle(face, new Point(mouth.x(), mouth.y()),
                 new Point(mouth.x() + mouth.width(), mouth.y() + mouth.height()), Scalar.RED,
                 2, CV_AA, 0);        
     }
     @Override
-    public void applyFaceFilter(Mat face, Mat skinMask, Mat perspectivePoints, Mat affinePoints, Mat altAffinePoints) {
-        final Mat transform = getAffineTransform(altFeaturesOnImage, altAffinePoints);
-        //final Mat transform = getAffineTransform(featuresOnImage, affinePoints);
+    public void applyFaceFilter(Mat face, Mat skinMask, TransformationFacePointsCollection points) {
+        final Mat transform = getAffineTransform(altFeaturesOnImage, points.getAltAffinePoints());
         final Mat transformedMask = new Mat(face.size(), face.type());
         final Mat transformedImage = new Mat(face.size(), face.type());
         warpAffine(faceMask, transformedMask, transform, face.size());

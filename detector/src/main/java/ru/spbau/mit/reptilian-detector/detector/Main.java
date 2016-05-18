@@ -13,29 +13,31 @@ import static org.bytedeco.javacpp.opencv_highgui.*;
 import static org.bytedeco.javacpp.opencv_videoio.*;
 
 
-public class Main {
+final class Main {
+    private Main() { }
 
     public static void main(String[] args) throws Exception {
+        final String resultWindowName = "RESULT";
         if (!args[0].equals("%Cam")) {
             System.out.println(args[0]);
             final Mat image = imread(args[0]);
             if (image != null) {
                 final FaceDetector detector = new FaceDetector();
-                final RectFilter filter = new RectFilter();
+                final IFilter filter = new FaceOrientationTestFilter();
                 System.out.println("Go detect");
                 final ArrayList<Face> faces = detector.detectFaces(image, true);
                 for (Face i : faces) {
                     i.applyFilter(filter);
                 }
-                namedWindow("Result", WINDOW_NORMAL);
-                imshow("Result", image);
+                namedWindow(resultWindowName, WINDOW_NORMAL);
+                imshow(resultWindowName, image);
                 cvWaitKey(0);
                 System.out.println("OK");
             }
         } else {
             Mat image;
             final FaceDetector detector = new FaceDetector();
-            final IFilter filter = new FaceOrientationTestFilter();//RectFilter();
+            final IFilter filter = new FaceOrientationTestFilter();
             final VideoCapture camera = new VideoCapture(0);
             camera.open(0);
             while (true) {
@@ -45,7 +47,7 @@ public class Main {
                 for (Face i : faces) {
                     i.applyFilter(filter);
                 }
-                imshow("Result", image);
+                imshow(resultWindowName, image);
                 cvWaitKey(1);
             }
         }

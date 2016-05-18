@@ -33,8 +33,6 @@ public class FaceDetector {
     private CascadeClassifier mouthHaarCascade;
     private CascadeClassifier noseHaarCascade;
     
-    //Constructors
-    
     public FaceDetector() throws Exception {
         faceHaarCascade = new CascadeClassifier(
                 ResourceManager.getPath(FACE_HAAR_CASCADE_NAME)
@@ -52,8 +50,6 @@ public class FaceDetector {
                 ResourceManager.getPath(NOSE_HAAR_CASCADE_NAME)
         );
     }
-    
-    //Other methods
     
     public ArrayList<Face> detectFaces(Mat image, boolean withFeatures) {
         final Mat imageGray = new Mat();
@@ -192,26 +188,15 @@ public class FaceDetector {
     public void detectSkin(Face face) {
         //Not implemented
     }
-    //Inner Methods
     
-    //WHY I NEED TO DO THIS!? STUPID JAVA XC
-    int min(int a, int b) {
-        if (a < b) {
-            return a;
-        }
-        return b;
-    }
-    
-    Rect cutRect(Rect r, Mat m) {
-        final Point p1 = new Point(-min(-r.x(), 0), -min(-r.y(), 0));
-        final Point p2 = new Point(min(r.x() + r.width(), m.cols() - 1),
-                min(r.y() + r.height(), m.rows() - 1));
+    private Rect cutRect(Rect r, Mat m) {
+        final Point p1 = new Point(-Math.min(-r.x(), 0), -Math.min(-r.y(), 0));
+        final Point p2 = new Point(Math.min(r.x() + r.width(), m.cols() - 1),
+                Math.min(r.y() + r.height(), m.rows() - 1));
         return new Rect(p1, p2);
     }
 
-    
-    //remove unnecessery rects
-    RectVector deleteInnerRects(RectVector vect) {
+    private RectVector deleteInnerRects(RectVector vect) {
         final RectVector result = new RectVector();
         for (int i = 0; i < vect.size(); i++) {
             boolean putIt = true;
@@ -229,11 +214,9 @@ public class FaceDetector {
         return result;
     }
     
-    //Check is rectangle a situated in rectangle b?
-    boolean innerRect(Rect a, Rect b) {
+    private boolean innerRect(Rect a, Rect b) {
         if (a.x() > b.x() && a.y() > b.y() && (a.x() + a.width()) < (b.x() + b.width())
                 && (a.y() + a.height()) < (b.y() + b.height())) {
-            
             return true;
         }
         return false;

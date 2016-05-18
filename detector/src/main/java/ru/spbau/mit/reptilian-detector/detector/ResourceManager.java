@@ -7,7 +7,9 @@ import org.bytedeco.javacpp.indexer.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacv.*;
 
-public class ResourceManager {
+final class ResourceManager {
+    private ResourceManager() { }
+    
     static String getPath(String resourceName) throws Exception {
         final int nameStartIndex = resourceName.lastIndexOf("/") + 1;
         final String rName = resourceName.substring(nameStartIndex);

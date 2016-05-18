@@ -45,7 +45,6 @@ dependencies {
     compile group: bytedeco, name: 'javacpp', version: javaCvVersion
     compile group: bytedeco, name: 'javacv',  version: javaCvVersion
 }
-
 jar {
     manifest.attributes("Main-Class": mainClassName)
 }
