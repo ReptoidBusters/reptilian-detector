@@ -1,5 +1,15 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'ru.vyarus:gradle-quality-plugin:1.3.0'
+    }
+}
+
 apply plugin: "java"
 apply plugin: "application"
+apply plugin: "ru.vyarus.quality"
 
 mainClassName = 'ru.spbau.mit.reptilian_detector.detector.Main'
 
@@ -35,7 +45,6 @@ dependencies {
     compile group: bytedeco, name: 'javacpp', version: javaCvVersion
     compile group: bytedeco, name: 'javacv',  version: javaCvVersion
 }
-
 jar {
     manifest.attributes("Main-Class": mainClassName)
 }
