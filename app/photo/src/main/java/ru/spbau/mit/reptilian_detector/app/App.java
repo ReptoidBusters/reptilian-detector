@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 
 public class App extends AppCompatActivity {
@@ -40,7 +41,12 @@ public class App extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        createDirectory();
+        try {
+            createDirectory();
+        }
+        catch (SecurityException e) {
+            Toast.makeText(this, e.toString() + " :( ", Toast.LENGTH_LONG).show();
+        }
         ivPhoto = (ImageView) findViewById(R.id.ivPhoto);
     }
 
@@ -120,13 +126,13 @@ public class App extends AppCompatActivity {
         return Uri.fromFile(file);
     }
 
-    private void createDirectory() {
+    private void createDirectory() throws SecurityException {
         directory = new File(
                 Environment
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "MyFolder");
-        if (!directory.exists()) {
-            assert directory.mkdirs();
+                "Reptilian");
+        if (!directory.exists() && !directory.mkdirs()) {
+            throw new SecurityException();
         }
     }
 

@@ -2,7 +2,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    >
 
     <Button
         android:id="@+id/btnPhoto"
@@ -10,8 +9,7 @@
         android:layout_height="wrap_content"
         android:onClick="onClickPhoto"
         android:text="@string/photo"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/fef"></Button>
+        android:layout_alignParentTop="true"></Button>
 
     <Button
         android:id="@+id/btnVideo"
@@ -22,19 +20,13 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"></Button>
 
-    <TextView
-        android:id="@+id/fef"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnVideo">
-        ></TextView>
-
     <ImageView
         android:id="@+id/ivPhoto"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="#00ffffff"
-        android:layout_below="@+id/btnVideo"></ImageView>
+        android:layout_below="@+id/btnVideo"
+        android:contentDescription="Photo"></ImageView>
 
 
 </RelativeLayout>

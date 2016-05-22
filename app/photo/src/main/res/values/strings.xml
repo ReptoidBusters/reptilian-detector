@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Photo</string>
-    <string name="action_settings">Settings</string>
     <string name="photo">Photo</string>  
     <string name="video">Video</string>
 </resources>
