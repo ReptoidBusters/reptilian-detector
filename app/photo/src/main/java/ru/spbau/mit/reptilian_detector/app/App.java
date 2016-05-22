@@ -41,11 +41,8 @@ public class App extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        try {
-            createDirectory();
-        }
-        catch (SecurityException e) {
-            Toast.makeText(this, e.toString() + " :( ", Toast.LENGTH_LONG).show();
+        if (!createDirectory()) {
+            Toast.makeText(this, "Error :( ", Toast.LENGTH_LONG).show();
         }
         ivPhoto = (ImageView) findViewById(R.id.ivPhoto);
     }
@@ -126,14 +123,12 @@ public class App extends AppCompatActivity {
         return Uri.fromFile(file);
     }
 
-    private void createDirectory() throws SecurityException {
+    private boolean createDirectory() {
         directory = new File(
                 Environment
                         .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                 "Reptilian");
-        if (!directory.exists() && !directory.mkdirs()) {
-            throw new SecurityException();
-        }
+        return directory.exists() || directory.mkdirs();
     }
 
 }
