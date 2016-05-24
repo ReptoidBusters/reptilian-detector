@@ -1,7 +1,5 @@
 package ru.spbau.mit.reptilian_detector.detector;
 
-import java.util.ArrayList;
-
 import org.bytedeco.javacpp.indexer.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacv.*;
@@ -25,10 +23,7 @@ final class Main {
                 final FaceDetector detector = new FaceDetector();
                 final IFilter filter = new FaceOrientationTestFilter();
                 System.out.println("Go detect");
-                final ArrayList<Face> faces = detector.detectFaces(image, true);
-                for (Face i : faces) {
-                    i.applyFilter(filter);
-                }
+                filter.applyFilter(image, detector.detectFaces(image, true));
                 namedWindow(resultWindowName, WINDOW_NORMAL);
                 imshow(resultWindowName, image);
                 cvWaitKey(0);
@@ -43,10 +38,7 @@ final class Main {
             while (true) {
                 image = new Mat();
                 camera.read(image);
-                final ArrayList<Face> faces = detector.detectFaces(image, true);
-                for (Face i : faces) {
-                    i.applyFilter(filter);
-                }
+                filter.applyFilter(image, detector.detectFaces(image, true));
                 imshow(resultWindowName, image);
                 cvWaitKey(1);
             }

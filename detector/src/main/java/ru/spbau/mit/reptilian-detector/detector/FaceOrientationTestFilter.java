@@ -1,5 +1,6 @@
 package ru.spbau.mit.reptilian_detector.detector;
 
+import java.util.ArrayList;
 import org.bytedeco.javacv.*;
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
@@ -30,6 +31,12 @@ public class FaceOrientationTestFilter implements IFilter {
                 820f, 1650f,
                 1750f, 1650f,
                 1300f, 2640f).reshape(2, 3);
+    }
+    
+    public void applyFilter(Mat image, ArrayList<Face> faces) {
+        for (Face f : faces) {
+            f.applyFilter(this);
+        }
     }
     
     @Override
