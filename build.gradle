@@ -1,0 +1,20 @@
+task wrapper(type: Wrapper) {
+    gradleVersion = "1.12"
+}
+
+apply plugin: "java"
+
+subprojects {
+    tasks.withType(JavaCompile) {
+        apply plugin: "java"
+
+        sourceCompatibility = JavaVersion.VERSION_1_7
+        targetCompatibility = JavaVersion.VERSION_1_7
+    }
+}
+
+configure(":app") {
+    dependencies {
+        compile project(":detector")
+    }
+}
