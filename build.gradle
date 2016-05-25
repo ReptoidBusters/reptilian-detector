@@ -4,10 +4,23 @@ task wrapper(type: Wrapper) {
 
 apply plugin: "java"
 
-subprojects {
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.5.0'
+        classpath 'com.noveogroup.android:check:1.2.3'
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
     tasks.withType(JavaCompile) {
         apply plugin: "java"
-
         sourceCompatibility = JavaVersion.VERSION_1_7
         targetCompatibility = JavaVersion.VERSION_1_7
     }

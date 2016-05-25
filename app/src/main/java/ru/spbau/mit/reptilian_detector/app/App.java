@@ -1,5 +1,7 @@
 package ru.spbau.mit.reptilian_detector.app;
 
+import ru.spbau.mit.reptilian_detector.detector;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;

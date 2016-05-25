@@ -1,20 +1,33 @@
-buildscript {
-    repositories {
-        jcenter()
+apply plugin: 'com.android.application'
+apply plugin: 'com.noveogroup.android.check'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
     }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:1.5.0'
-        classpath 'com.noveogroup.android:check:1.2.3'
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
 }
 
-allprojects {
-    repositories {
-        jcenter()
-    }
+check {
+    abortOnError true
+    checkstyle { config easy() }
+    findbugs { config easy() }
+    pmd { config hard() }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+dependencies {
+    compile 'com.android.support:appcompat-v7:23.2.0'
+    compile 'com.android.support:design:23.2.0'
 }
 
