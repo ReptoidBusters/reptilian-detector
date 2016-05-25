@@ -10,6 +10,7 @@ import static org.bytedeco.javacpp.opencv_objdetect.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
 import static org.bytedeco.javacpp.opencv_videoio.*;
 
+@SuppressWarnings({"JavadocType", "PMD"})
 
 final class Main {
     private Main() { }

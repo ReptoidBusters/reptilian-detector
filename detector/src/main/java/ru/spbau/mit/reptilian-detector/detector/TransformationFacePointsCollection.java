@@ -4,6 +4,8 @@ import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
+@SuppressWarnings({"JavadocType", "PMD"})
+
 public class TransformationFacePointsCollection {
     private Point eye1;
     private Point eye2;

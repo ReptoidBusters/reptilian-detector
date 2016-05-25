@@ -11,6 +11,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 import static org.bytedeco.javacpp.opencv_objdetect.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
 
+@SuppressWarnings({"JavadocType", "PMD"})
 
 public class FaceDetector {   
     static final float FACE_DETECT_ACCURACY = 1.05f;

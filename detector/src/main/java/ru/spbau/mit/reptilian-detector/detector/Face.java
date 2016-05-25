@@ -5,6 +5,8 @@ import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 
+@SuppressWarnings({"JavadocType", "PMD"})
+
 public class Face {
     private RectVector eyes;
     private Rect nose;
@@ -217,6 +219,7 @@ public class Face {
             final Point s = new Point((int) (first.x() + (second.x() - first.x()) * size / length()),
                     (int) (first.y() + (second.y() - first.y()) * size / length()));
             first = f;
+            second = s;
         }
     
         Segment getOrtho() {

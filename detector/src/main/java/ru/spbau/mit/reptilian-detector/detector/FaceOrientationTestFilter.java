@@ -7,6 +7,8 @@ import static org.bytedeco.javacpp.opencv_imgproc.*;
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
 
+@SuppressWarnings({"JavadocType", "PMD"})
+
 public class FaceOrientationTestFilter implements IFilter {
     static final String FACE_IMAGE_NAME 
             = "filters_data/FaceOrientationTest/image.jpg";
@@ -15,7 +17,6 @@ public class FaceOrientationTestFilter implements IFilter {
             
     private Mat faceImage;
     private Mat faceMask;
-    private Mat featuresOnImage;
     private Mat altFeaturesOnImage;
     
     FaceOrientationTestFilter() throws Exception {
@@ -23,10 +24,6 @@ public class FaceOrientationTestFilter implements IFilter {
         final Mat tmp = imread(ResourceManager.getPath(FACE_MASK_NAME));
         faceMask = new Mat();
         cvtColor(tmp, faceMask, CV_BGR2GRAY);
-        featuresOnImage = new Mat(
-                820f, 1650f,
-                1750f, 1650f,
-                1300f, 2190f).reshape(2, 3);
         altFeaturesOnImage = new Mat(
                 820f, 1650f,
                 1750f, 1650f,

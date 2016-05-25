@@ -7,6 +7,8 @@ import org.bytedeco.javacpp.indexer.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacv.*;
 
+@SuppressWarnings({"JavadocType", "PMD"})
+
 final class ResourceManager {
     private ResourceManager() { }
     
