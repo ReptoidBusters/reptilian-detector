@@ -1,6 +1,8 @@
 *.class
 .gradle
 build/
+local.properties
+*.iml
 
 # Ignore Gradle GUI config
 gradle-app.setting

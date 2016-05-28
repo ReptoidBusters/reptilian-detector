@@ -1,6 +1,6 @@
 package ru.spbau.mit.reptilian_detector.app;
 
-import ru.spbau.mit.reptilian_detector.detector;
+import ru.spbau.mit.reptilian_detector.detector.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,6 +63,7 @@ public class App extends AppCompatActivity {
     private void setImageUri() {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(),imageUri);
+
             ivPhoto.setImageBitmap(Bitmap.createScaledBitmap(bitmap, 500, 500, false));
             ivPhoto.invalidate();
         } catch (IOException e) {
