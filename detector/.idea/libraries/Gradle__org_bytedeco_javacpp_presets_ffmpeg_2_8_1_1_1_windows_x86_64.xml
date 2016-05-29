@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.bytedeco.javacpp-presets:ffmpeg:2.8.1-1.1:windows-x86_64">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/ffmpeg/2.8.1-1.1/7454f44054aa6a7e9f4548975cb1b9d5f078d62b/ffmpeg-2.8.1-1.1-windows-x86_64.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.bytedeco.javacpp-presets/ffmpeg/2.8.1-1.1/25f5d601fe82d70c2c9043cc31e61bc57c18b22e/ffmpeg-2.8.1-1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -9,19 +9,13 @@ import static org.bytedeco.javacpp.opencv_highgui.*;
 public class FaceOrientationTestFilter implements IFilter {
     static final String FACE_IMAGE_NAME 
             = "filters_data/FaceOrientationTest/image.jpg";
-    static final String FACE_MASK_NAME 
-            = "filters_data/FaceOrientationTest/mask.jpg";
-            
+
     private Mat faceImage;
-    private Mat faceMask;
     private Mat featuresOnImage;
     private Mat altFeaturesOnImage;
     
     FaceOrientationTestFilter() throws Exception {
         faceImage = imread(ResourceManager.getPath(FACE_IMAGE_NAME));
-        final Mat tmp = imread(ResourceManager.getPath(FACE_MASK_NAME));
-        faceMask = new Mat();
-        cvtColor(tmp, faceMask, CV_BGR2GRAY);
         featuresOnImage = new Mat(
                 820f, 1650f,
                 1750f, 1650f,
@@ -53,11 +47,9 @@ public class FaceOrientationTestFilter implements IFilter {
     @Override
     public void applyFaceFilter(Mat face, Mat skinMask, TransformationFacePointsCollection points) {
         final Mat transform = getAffineTransform(altFeaturesOnImage, points.getAltAffinePoints());
-        final Mat transformedMask = new Mat(face.size(), face.type());
         final Mat transformedImage = new Mat(face.size(), face.type());
-        warpAffine(faceMask, transformedMask, transform, face.size());
         warpAffine(faceImage, transformedImage, transform, face.size());
-        transformedImage.copyTo(face, transformedMask);
+        transformedImage.copyTo(face, skinMask);
         rectangle(face, new Point(2, 2), new Point(face.cols() - 2, face.rows() - 2),
                 Scalar.YELLOW, 2, CV_AA, 0);
     }

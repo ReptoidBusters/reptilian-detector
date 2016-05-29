@@ -3,13 +3,17 @@ package ru.spbau.mit.reptilian_detector.detector;
 import java.util.ArrayList;
 
 import org.bytedeco.javacpp.indexer.*;
-import org.bytedeco.javacpp.*;
-import org.bytedeco.javacv.*;
+import org.bytedeco.javacpp.opencv_core;
+
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
-import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 import static org.bytedeco.javacpp.opencv_objdetect.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
+
+
+import java.util.*;
+
+import javafx.scene.shape.Circle;
 
 
 public class FaceDetector {   
@@ -81,10 +85,10 @@ public class FaceDetector {
     
     public void detectEyesOnFace(Face face) {
         final Rect leftEyesPositionRect = new Rect(new Point(0, face.getPos().height() / 7),
-                new Point(face.getPos().width() * 3 / 5, face.getPos().height() * 9 / 14));
-        final Rect rightEyesPositionRect = new Rect(new Point(face.getPos().width() * 1 / 5, 
+                new Point(face.getPos().width() * 2 / 4, face.getPos().height() * 8 / 14));
+        final Rect rightEyesPositionRect = new Rect(new Point(face.getPos().width() * 2 / 4,
                 face.getPos().height() / 7), new Point(face.getPos().width(),
-                face.getPos().height() * 9 / 14));
+                face.getPos().height() * 8 / 14));
         final Mat leftGrayFace = new Mat(face.getGrayImage(), leftEyesPositionRect);
         final Mat rightGrayFace = new Mat(face.getGrayImage(), rightEyesPositionRect);
         
@@ -125,10 +129,10 @@ public class FaceDetector {
                 }
             } 
             eyes.resize(eyes.size() + 1);
-            eyes.put(eyes.size() - 1, new Rect(new Point(face.getPos().width() * 1 / 3 + rightEye.x(),
-                rightEye.y() + face.getPos().height() / 7), new Point(
-                face.getPos().width() * 1 / 3 + rightEye.x() + rightEye.width(),
-                rightEye.y() + rightEye.height() + face.getPos().height() / 7)));
+            eyes.put(eyes.size() - 1, new Rect(new Point(face.getPos().width() * 1 / 2 + rightEye.x(),
+                    rightEye.y() + face.getPos().height() / 7), new Point(
+                    face.getPos().width() * 1 / 2 + rightEye.x() + rightEye.width(),
+                    rightEye.y() + rightEye.height() + face.getPos().height() / 7)));
         }
         face.setEyes(eyes); 
     }
@@ -184,11 +188,147 @@ public class FaceDetector {
             face.setMouth(cutRect(result, face.getImage()));
         }
     }
-    
-    public void detectSkin(Face face) {
-        //Not implemented
+
+    private boolean isValid(int x, int y, int w, int h) {
+        return x >= 0 && y >= 0 && x < w && y < h;
+    }
+
+    private void bfs(UByteBufferIndexer buf, UByteBufferIndexer mask, Point p2, Scalar lowerDiff, Scalar upperDiff, int h, int w) {
+        ArrayDeque<Point> q = new ArrayDeque<Point>();
+        if (mask.get(p2.y(), p2.x()) != 0) return;
+        q.add(p2);
+        mask.put(p2.y(), p2.x(), 1);
+        while (!q.isEmpty()) {
+            Point p = q.poll();
+
+            int ok1 = 1;
+            int ok2 = 1;
+            int ok3 = 1;
+            int ok4 = 1;
+
+            for (int i = 0; i < 3; i++) {
+                if (!isValid(p.x(), p.y() + 1, w, h)
+                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y() + 1, p.x(), i)
+                        || buf.get(p.y() + 1, p.x(), i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
+                    ok1 = 0;
+                }
+
+                if (!isValid(p.x(), p.y() - 1, w, h)
+                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y() - 1, p.x(), i)
+                        || buf.get(p.y() - 1, p.x(), i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
+                    ok2 = 0;
+                }
+
+                if (!isValid(p.x() + 1, p.y(), w, h)
+                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y(), p.x() + 1, i)
+                        || buf.get(p.y(), p.x() + 1, i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
+                    ok3 = 0;
+                }
+
+                if (!isValid(p.x() - 1, p.y(), w, h)
+                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y(), p.x() - 1, i)
+                        || buf.get(p.y(), p.x() - 1, i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
+                    ok4 = 0;
+                }
+            }
+
+            if (ok3 == 1 && mask.get(p.y(), p.x() + 1) == 0) {
+                q.add(new Point(p.x() + 1, p.y()));
+                mask.put(p.y(), p.x() + 1, 1);
+            }
+            if (ok4 == 1 && mask.get(p.y(), p.x() - 1) == 0) {
+                q.add(new Point(p.x() - 1, p.y()));
+                mask.put(p.y(), p.x() - 1, 1);
+            }
+            if (ok1 == 1 && mask.get(p.y() + 1, p.x()) == 0) {
+                q.add(new Point(p.x(), p.y() + 1));
+                mask.put(p.y() + 1, p.x(), 1);
+            }
+            if (ok2 == 1 && mask.get(p.y() - 1, p.x()) == 0) {
+                q.add(new Point(p.x(), p.y() - 1));
+                mask.put(p.y() - 1, p.x(), 1);
+            }
+
+        }
+
     }
     
+    public void detectSkin(Face face) {
+        int sw = face.getImage().cols();
+        int sh = face.getImage().rows();
+        Mat yuv = new Mat(sh, sw, CV_8UC3);
+        cvtColor(face.getImage(), yuv, CV_BGR2YCrCb);
+
+        Mat edges = new Mat(sh, sw, CV_8UC1, new Scalar(0));
+        Canny(face.getGrayImage(), edges, 90, 120);
+        Mat mask = edges.clone();
+        //imshow("edges", edges);
+        //cvWaitKey(0);
+        ArrayList<Point> skinPts = new ArrayList<Point>();
+
+        RectVector eye = face.getEyes();
+        Rect nose = face.getNose();
+        Rect mouth = face.getMouth();
+
+        int strangeConstant = 10;
+
+        if (nose != null) {
+            skinPts.add(new Point(nose.x() + nose.width() / 2, nose.y() + nose.height() / 2));
+        }
+
+        if (mouth != null) {
+            skinPts.add(new Point(mouth.x() + mouth.width() / 2, mouth.y() + mouth.height() / 2 + strangeConstant));
+        }
+
+        if (eye != null) {
+            for (int i = 0; i < eye.size(); i++) {
+                skinPts.add(new Point(eye.get(i).x() + eye.get(i).width() / 2,
+                        eye.get(i).y() + eye.get(i).width() + strangeConstant));
+                if (nose != null) {
+                    skinPts.add(new Point(eye.get(i).x() + eye.get(i).width() / 2, nose.y() + nose.height() / 2));
+                }
+            }
+        }
+
+        Scalar sc = new Scalar(3);
+        sc.put(0, 0);
+        sc.put(1, 0);
+        sc.put(2, 255);
+        for (int i = 0; i < skinPts.size(); i++) {
+            circle(face.getImage(), skinPts.get(i), 5, sc);
+        }
+
+        final int LOWER_Y = 15; //60;
+        final int UPPER_Y = 15; //80;
+        final int LOWER_Cr = 8; //25;
+        final int UPPER_Cr = 8; //15;
+        final int LOWER_Cb = 5; //20;
+        final int UPPER_Cb = 5; //15;
+
+        Scalar lowerDiff = new Scalar(3);
+        lowerDiff.put(0, LOWER_Y);
+        lowerDiff.put(1, LOWER_Cr);
+        lowerDiff.put(2, LOWER_Cb);
+
+        Scalar upperDiff = new Scalar(3);
+        upperDiff.put(0, UPPER_Y);
+        upperDiff.put(1, UPPER_Cr);
+        upperDiff.put(2, UPPER_Cb);
+
+        UByteBufferIndexer buf = mask.createIndexer();
+
+        UByteBufferIndexer imageBuf = yuv.createIndexer();
+
+        for (int i = 0; i < skinPts.size(); i++) {
+            bfs(imageBuf, buf, skinPts.get(i), lowerDiff, upperDiff, sh, sw);
+        }
+
+        mask = opencv_core.subtract(mask, edges).asMat();
+
+        face.setSkinMask(mask);
+
+    }
+
     private Rect cutRect(Rect r, Mat m) {
         final Point p1 = new Point(-Math.min(-r.x(), 0), -Math.min(-r.y(), 0));
         final Point p2 = new Point(Math.min(r.x() + r.width(), m.cols() - 1),
