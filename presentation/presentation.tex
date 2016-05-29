@@ -1,0 +1,34 @@
+\documentclass[10pt,pdf,hyperref={unicode}]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{graphicx}
+\usetheme{Madrid}
+
+\usenavigationsymbolstemplate{}
+\setbeamertemplate{footline}[frame number]
+
+\begin{document}
+
+\title[Детектор рептилоидов]{Детектор рептилоидов}
+\subtitle{НИР, весна 2016}
+\author{Татьяна Белова \\ Олег Свидченко \\~\\
+        Руководители: Богдан Бугаев, Антон Крыщенко}
+\date{31 мая 2016 г.}
+\institute{Академический университет}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\input{belova.tex}
+\input{svidchenko.tex}
+
+\begin{frame}
+    \begin{center}
+        Спасибо за внимание! \\
+        \includegraphics[width=0.5\textwidth]{qr.eps} \\
+        \url{https://github.com/ReptoidBusters/reptilian-detector}
+    \end{center}
+\end{frame}
+
+\end{document}
