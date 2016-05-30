@@ -31,6 +31,14 @@ public class FaceDetector {
     static final String NOSE_HAAR_CASCADE_NAME  
             = "haarcascades/haarcascade_nose.xml";
 
+    static final int LOWER_Y = 35; //60;
+    static final int UPPER_Y = 35; //80;
+    static final int LOWER_Cr = 25; //25;
+    static final int UPPER_Cr = 15; //15;
+    static final int LOWER_Cb = 20; //20;
+    static final int UPPER_Cb = 15; //15;
+    static final int LOW_TRASHOLD = 100;
+
     private CascadeClassifier faceHaarCascade;
     private CascadeClassifier rightEyeHaarCascade;
     private CascadeClassifier leftEyeHaarCascade;
@@ -193,58 +201,67 @@ public class FaceDetector {
         return x >= 0 && y >= 0 && x < w && y < h;
     }
 
-    private void bfs(UByteBufferIndexer buf, UByteBufferIndexer mask, Point p2, Scalar lowerDiff, Scalar upperDiff, int h, int w) {
+    private void bfs(UByteBufferIndexer buf, UByteBufferIndexer mask, 
+    Point seedPoint, Scalar lowerDiff, Scalar upperDiff, int h, int w) {
         ArrayDeque<Point> q = new ArrayDeque<Point>();
-        if (mask.get(p2.y(), p2.x()) != 0) return;
-        q.add(p2);
-        mask.put(p2.y(), p2.x(), 1);
+        if (mask.get(seedPoint.y(), seedPoint.x()) != 0) return;
+        q.add(seedPoint);
+        mask.put(seedPoint.y(), seedPoint.x(), 1);
         while (!q.isEmpty()) {
             Point p = q.poll();
 
-            int ok1 = 1;
-            int ok2 = 1;
-            int ok3 = 1;
-            int ok4 = 1;
+            boolean ok1 = true;
+            boolean ok2 = true;
+            boolean ok3 = true;
+            boolean ok4 = true;
 
             for (int i = 0; i < 3; i++) {
                 if (!isValid(p.x(), p.y() + 1, w, h)
-                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y() + 1, p.x(), i)
-                        || buf.get(p.y() + 1, p.x(), i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
-                    ok1 = 0;
+                        || buf.get(seedPoint.y(), seedPoint.x(), i) 
+                        - lowerDiff.get(i) > buf.get(p.y() + 1, p.x(), i)
+                        || buf.get(p.y() + 1, p.x(), i) 
+                        > buf.get(seedPoint.y(), seedPoint.x(), i) + upperDiff.get(i)) {
+                    ok1 = false;
                 }
 
                 if (!isValid(p.x(), p.y() - 1, w, h)
-                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y() - 1, p.x(), i)
-                        || buf.get(p.y() - 1, p.x(), i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
-                    ok2 = 0;
+                        || buf.get(seedPoint.y(), seedPoint.x(), i) 
+                        - lowerDiff.get(i) > buf.get(p.y() - 1, p.x(), i)
+                        || buf.get(p.y() - 1, p.x(), i) 
+                        > buf.get(seedPoint.y(), seedPoint.x(), i) + upperDiff.get(i)) {
+                    ok2 = false;
                 }
 
                 if (!isValid(p.x() + 1, p.y(), w, h)
-                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y(), p.x() + 1, i)
-                        || buf.get(p.y(), p.x() + 1, i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
-                    ok3 = 0;
+                        || buf.get(seedPoint.y(), seedPoint.x(), i) 
+                        - lowerDiff.get(i) > buf.get(p.y(), p.x() + 1, i)
+                        || buf.get(p.y(), p.x() + 1, i) 
+                        > buf.get(seedPoint.y(), seedPoint.x(), i) + upperDiff.get(i)) {
+                    ok3 = false;
                 }
 
                 if (!isValid(p.x() - 1, p.y(), w, h)
-                        || buf.get(p2.y(), p2.x(), i) - lowerDiff.get(i) > buf.get(p.y(), p.x() - 1, i)
-                        || buf.get(p.y(), p.x() - 1, i) > buf.get(p2.y(), p2.x(), i) + upperDiff.get(i)) {
-                    ok4 = 0;
+                        || buf.get(seedPoint.y(), seedPoint.x(), i) 
+                        - lowerDiff.get(i) > buf.get(p.y(), p.x() - 1, i)
+                        || buf.get(p.y(), p.x() - 1, i) 
+                        > buf.get(seedPoint.y(), seedPoint.x(), i) + upperDiff.get(i)) {
+                    ok4 = false;
                 }
             }
 
-            if (ok3 == 1 && mask.get(p.y(), p.x() + 1) == 0) {
+            if (ok3 && mask.get(p.y(), p.x() + 1) == 0) {
                 q.add(new Point(p.x() + 1, p.y()));
                 mask.put(p.y(), p.x() + 1, 1);
             }
-            if (ok4 == 1 && mask.get(p.y(), p.x() - 1) == 0) {
+            if (ok4 && mask.get(p.y(), p.x() - 1) == 0) {
                 q.add(new Point(p.x() - 1, p.y()));
                 mask.put(p.y(), p.x() - 1, 1);
             }
-            if (ok1 == 1 && mask.get(p.y() + 1, p.x()) == 0) {
+            if (ok1 && mask.get(p.y() + 1, p.x()) == 0) {
                 q.add(new Point(p.x(), p.y() + 1));
                 mask.put(p.y() + 1, p.x(), 1);
             }
-            if (ok2 == 1 && mask.get(p.y() - 1, p.x()) == 0) {
+            if (ok2 && mask.get(p.y() - 1, p.x()) == 0) {
                 q.add(new Point(p.x(), p.y() - 1));
                 mask.put(p.y() - 1, p.x(), 1);
             }
@@ -258,52 +275,64 @@ public class FaceDetector {
         int sh = face.getImage().rows();
         Mat yuv = new Mat(sh, sw, CV_8UC3);
         cvtColor(face.getImage(), yuv, CV_BGR2YCrCb);
-
-        Mat edges = new Mat(sh, sw, CV_8UC1, new Scalar(0));
-        Canny(face.getGrayImage(), edges, 90, 120);
+        Scalar sc = new Scalar(1);
+        sc.put(0, 1);
+        MatVector channels = new MatVector();
+        split(yuv, channels);
+        equalizeHist(channels.get(0), channels.get(0));
+        merge(channels, yuv);
+        ////////////////////////////////////////////
+        
+        sc = new Scalar(1);
+        sc.put(0, 0);
+        Mat edges = new Mat(sh, sw, CV_8UC1, sc);
+        Canny(face.getGrayImage(), edges, LOW_TRASHOLD, 5 * LOW_TRASHOLD / 4);
+        dilate(edges, edges, new Mat());
+        erode(edges, edges, new Mat());
         Mat mask = edges.clone();
-        //imshow("edges", edges);
-        //cvWaitKey(0);
+        
         ArrayList<Point> skinPts = new ArrayList<Point>();
 
         RectVector eye = face.getEyes();
         Rect nose = face.getNose();
         Rect mouth = face.getMouth();
 
-        int strangeConstant = 10;
-
-        if (nose != null) {
-            skinPts.add(new Point(nose.x() + nose.width() / 2, nose.y() + nose.height() / 2));
-        }
-
-        if (mouth != null) {
-            skinPts.add(new Point(mouth.x() + mouth.width() / 2, mouth.y() + mouth.height() / 2 + strangeConstant));
-        }
-
+        final int offset = face.getPos().width() / 15;
+        
         if (eye != null) {
             for (int i = 0; i < eye.size(); i++) {
                 skinPts.add(new Point(eye.get(i).x() + eye.get(i).width() / 2,
-                        eye.get(i).y() + eye.get(i).width() + strangeConstant));
+                        eye.get(i).y() + eye.get(i).width() + 2*offset));
                 if (nose != null) {
-                    skinPts.add(new Point(eye.get(i).x() + eye.get(i).width() / 2, nose.y() + nose.height() / 2));
+                    skinPts.add(new Point(eye.get(i).x() + eye.get(i).width() / 2, 
+                        nose.y() + nose.height() / 2 - 2 * offset));
+                    skinPts.add(new Point(nose.x() + nose.width() / 2, 
+                        eye.get(i).y() + eye.get(i).height() / 2 + offset));
+                    skinPts.add(new Point(nose.x() + nose.width() / 2, 
+                        eye.get(i).y() - eye.get(i).height() / 2 - offset));
+                    skinPts.add(new Point(nose.x() + nose.width() / 2, 
+                        eye.get(i).y()));
                 }
             }
         }
 
-        Scalar sc = new Scalar(3);
-        sc.put(0, 0);
-        sc.put(1, 0);
-        sc.put(2, 255);
-        for (int i = 0; i < skinPts.size(); i++) {
-            circle(face.getImage(), skinPts.get(i), 5, sc);
+        if (nose != null) {
+            skinPts.add(new Point(nose.x() + nose.width() / 2, 
+                    nose.y() + nose.height() / 2 + 2 * offset));
+            skinPts.add(new Point(nose.x() + nose.width() / 2, 
+                    nose.y() + nose.height() / 2 - 2 * offset));
+            skinPts.add(new Point(nose.x() + nose.width() / 2 - 4 * offset, 
+                    nose.y() + nose.height() / 2));
+            skinPts.add(new Point(nose.x() + nose.width() / 2 + 4 * offset, 
+                    nose.y() + nose.height() / 2));
         }
 
-        final int LOWER_Y = 15; //60;
-        final int UPPER_Y = 15; //80;
-        final int LOWER_Cr = 8; //25;
-        final int UPPER_Cr = 8; //15;
-        final int LOWER_Cb = 5; //20;
-        final int UPPER_Cb = 5; //15;
+        if (mouth != null) {
+            skinPts.add(new Point(mouth.x() + mouth.width() / 2, 
+                    mouth.y() + mouth.height() / 2 + offset));
+            skinPts.add(new Point(mouth.x() + mouth.width() / 2, 
+                    mouth.y() + mouth.height() / 2));
+        }
 
         Scalar lowerDiff = new Scalar(3);
         lowerDiff.put(0, LOWER_Y);
@@ -316,17 +345,20 @@ public class FaceDetector {
         upperDiff.put(2, UPPER_Cb);
 
         UByteBufferIndexer buf = mask.createIndexer();
-
         UByteBufferIndexer imageBuf = yuv.createIndexer();
 
         for (int i = 0; i < skinPts.size(); i++) {
+            /*rectangle(face.getImage(), skinPts.get(i),
+                new Point(skinPts.get(i).x() + 10, skinPts.get(i).y() + 10), Scalar.RED,
+                2, CV_AA, 0);*/
             bfs(imageBuf, buf, skinPts.get(i), lowerDiff, upperDiff, sh, sw);
         }
 
         mask = opencv_core.subtract(mask, edges).asMat();
 
+        //face.setSkinMask(edges);
+        dilate(mask, mask, new Mat());
         face.setSkinMask(mask);
-
     }
 
     private Rect cutRect(Rect r, Mat m) {
