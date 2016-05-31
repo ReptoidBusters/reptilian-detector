@@ -1,10 +1,14 @@
 package ru.spbau.mit.reptilian_detector.detector;
 
+import java.util.ArrayList;
+
 import org.bytedeco.javacv.*;
 import static org.bytedeco.javacpp.opencv_core.*;
 import static org.bytedeco.javacpp.opencv_imgproc.*;
 import static org.bytedeco.javacpp.opencv_imgcodecs.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
+
+@SuppressWarnings({"JavadocType", "PMD"})
 
 public class FaceOrientationTestFilter implements IFilter {
     static final String FACE_IMAGE_NAME 
@@ -17,7 +21,7 @@ public class FaceOrientationTestFilter implements IFilter {
     private Mat featuresOnImage;
     private Mat altFeaturesOnImage;
     
-    FaceOrientationTestFilter() throws Exception {
+    public FaceOrientationTestFilter() throws Exception {
         faceImage = imread(ResourceManager.getPath(FACE_IMAGE_NAME));
         final Mat tmp = imread(ResourceManager.getPath(FACE_MASK_NAME));
         faceMask = new Mat();
@@ -30,6 +34,13 @@ public class FaceOrientationTestFilter implements IFilter {
                 820f, 1650f,
                 1750f, 1650f,
                 1300f, 2640f).reshape(2, 3);
+    }
+       
+    @Override
+    public void applyFilter(Mat image, ArrayList<Face> faces) {
+        for (Face f : faces) {
+            f.applyFilter(this);
+        }
     }
     
     @Override

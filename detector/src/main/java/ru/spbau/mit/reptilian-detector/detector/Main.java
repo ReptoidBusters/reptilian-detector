@@ -1,7 +1,5 @@
 package ru.spbau.mit.reptilian_detector.detector;
 
-import java.util.ArrayList;
-
 import org.bytedeco.javacpp.indexer.*;
 import org.bytedeco.javacpp.*;
 import org.bytedeco.javacv.*;
@@ -12,23 +10,21 @@ import static org.bytedeco.javacpp.opencv_objdetect.*;
 import static org.bytedeco.javacpp.opencv_highgui.*;
 import static org.bytedeco.javacpp.opencv_videoio.*;
 
+@SuppressWarnings({"JavadocType", "PMD"})
 
 final class Main {
     private Main() { }
 
     public static void main(String[] args) throws Exception {
         final String resultWindowName = "RESULT";
-        if (!args[0].equals("%Cam")) {
+        if ((args.length == 1) && (!args[0].equals("%Cam"))) {
             System.out.println(args[0]);
             final Mat image = imread(args[0]);
             if (image != null) {
                 final FaceDetector detector = new FaceDetector();
-                final IFilter filter = new FaceOrientationTestFilter();
+                final IFilter filter = new LightReptilianFilter();
                 System.out.println("Go detect");
-                final ArrayList<Face> faces = detector.detectFaces(image, true);
-                for (Face i : faces) {
-                    i.applyFilter(filter);
-                }
+                filter.applyFilter(image, detector.detectFaces(image, true));
                 namedWindow(resultWindowName, WINDOW_NORMAL);
                 imshow(resultWindowName, image);
                 cvWaitKey(0);
@@ -37,18 +33,26 @@ final class Main {
         } else {
             Mat image;
             final FaceDetector detector = new FaceDetector();
-            final IFilter filter = new FaceOrientationTestFilter();
             final VideoCapture camera = new VideoCapture(0);
             camera.open(0);
             while (true) {
-                image = new Mat();
-                camera.read(image);
-                final ArrayList<Face> faces = detector.detectFaces(image, true);
-                for (Face i : faces) {
-                    i.applyFilter(filter);
+                IFilter filter = new LightReptilianFilter();
+                if (args.length == 2) {
+                    if (args[1] == "%Dark") {
+                        filter = new DarkReptilianFilter();
+                    }
+                    if (args[1] == "%Pain") {
+                        filter = new PainFilter();
+                    }
                 }
+                image = new Mat();
+                ///Preventing frames delay
+                for (int i = 0; i < 13; i++) {
+                    camera.read(image);
+                }
+                filter.applyFilter(image, detector.detectFaces(image, true));
                 imshow(resultWindowName, image);
-                cvWaitKey(1);
+                cvWaitKey(0);
             }
         }
     }
